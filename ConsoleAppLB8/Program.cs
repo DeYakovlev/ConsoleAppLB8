@@ -13,7 +13,8 @@ namespace ConsoleAppLB8
     {
         static void Main(string[] args)
         {
-            Task1();
+            //Task1();
+            Task2();
 
 
         }
@@ -56,6 +57,42 @@ namespace ConsoleAppLB8
 
             Console.WriteLine("--- Задание 1 завершено ---\n");
 
+        }
+
+        //------------------------------------
+        // Задание 2. Обобщенные интерфейсы
+        //------------------------------------
+        static void Task2()
+        {
+            Console.WriteLine("--- Задание 2. Обобщенные интерфейсы ---\n");
+
+            // Демонстрация ковариантности (out)
+            Console.WriteLine("=== КОВАРИАНТНОСТЬ (out) ===");
+            Console.WriteLine("Фабрика Car может быть присвоена фабрике Vehicle\n");
+
+            // Создаем фабрику автомобилей
+            CarFactory carFactory = new CarFactory();
+
+            // Ковариантность: IVehicleFactory<Car> присваивается IVehicleFactory<Vehicle>
+            // Это безопасно, т.к. Car является подтипом Vehicle
+            IVehicleFactory<Vehicle> vehicleFactory = carFactory;
+
+            Console.WriteLine("Создание через CarFactory:");
+            Car car = carFactory.Produce();
+            Console.WriteLine(car);
+            car.Refuel(20);  // Метод из Car
+            Console.WriteLine();
+
+            Console.WriteLine("Создание через IVehicleFactory<Vehicle> (ковариантность):");
+            Vehicle vehicle = vehicleFactory.Produce();  // Вернет Car
+            Console.WriteLine(vehicle);
+            Console.WriteLine();
+
+            // Демонстрация что без out это было бы невозможно
+            Console.WriteLine("ВАЖНО: Без 'out' присваивание было бы ошибкой компиляции!");
+            Console.WriteLine("'out' гарантирует что T используется только на выходе\n");
+
+            Console.WriteLine("--- Задание 2 завершено ---\n");
         }
 
     }
@@ -110,7 +147,7 @@ namespace ConsoleAppLB8
             Console.WriteLine($"{Name}Прекращает движение");
         }
 
-        public string GetStatus() 
+        public virtual string GetStatus() 
         {
             return isMoving ? "В движении" : "Стоит";
         }
@@ -228,6 +265,7 @@ namespace ConsoleAppLB8
 
     }
 
+    // Класс для демонстрации обертки
     class CarWrepped : Vehicle, IMovable, IServicable 
     {
         private bool isUnderService;
@@ -273,6 +311,44 @@ namespace ConsoleAppLB8
         }
     }
 
+    
+    //Обобщенный интерфейс 
+    interface IVehicleFactory<out T> 
+    {
+        T Produce();
+    }
+
+    class Car : Vehicle 
+    {
+        public int FuelLevel { get; set; }
+        
+        public Car (string name) : base (name) 
+        {
+            FuelLevel = 0;
+        }
+
+        public void Refuel(int fuel)
+        {
+            FuelLevel = fuel;
+            Console.WriteLine($"{Name} заполнен до {FuelLevel}");
+        }
+
+        public override string ToString()
+        {
+            return ($"[Car]{Name}, статус {GetStatus()}, топливо: {FuelLevel}");
+        }
+    }
+
+    class CarFactory : IVehicleFactory<Car> 
+    {
+        int counter = 0;
+        public Car Produce() 
+        {
+            counter ++;
+            Car car = new Car ($"Car - {counter}");
+            return car;
+        }
+    }
 
 
 }
