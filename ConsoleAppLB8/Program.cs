@@ -14,7 +14,8 @@ namespace ConsoleAppLB8
         static void Main(string[] args)
         {
             //Task1();
-            Task2();
+            //Task2();
+            Task3();
 
 
         }
@@ -93,6 +94,46 @@ namespace ConsoleAppLB8
             Console.WriteLine("'out' гарантирует что T используется только на выходе\n");
 
             Console.WriteLine("--- Задание 2 завершено ---\n");
+        }
+
+        //------------------------------------
+        // Задание 3. Работа с массивом
+        //------------------------------------
+        static void Task3() 
+        {
+            Console.WriteLine("--- Задание 3. Работа с массивом ---\n");
+
+            IMovable[] movables = new IMovable[]
+            {
+                new Vehicle("Базовое ТС"),
+                new Car("Легковой автомобиль"),
+                new CarGlued("Авто со склейкой"),
+                new Vehicle("Базовое ТС2"),
+                new CarWrepped("Авто с оборткой")
+            };
+
+            Console.WriteLine("=== Цикл по массиву IMovable ===\n");
+            for (int i = 0; i < movables.Length; i++) 
+            {
+                Console.WriteLine($"Элемент: {i}");
+                // Выозов метода ToString
+                Console.WriteLine($"ToString: {movables[i].ToString()}");
+
+                if (movables[i] is IServicable servicable) 
+                {
+                    Console.WriteLine("Объект поддерживает IServicable");
+                    Console.WriteLine($"Интервал обслуживани: {servicable.GetServiceInterval()}");
+                    servicable.Service();
+                }
+                else 
+                {
+                    Console.WriteLine($"  НЕ поддерживает IServicable");
+                }
+
+                Console.WriteLine();
+            }
+
+            Console.WriteLine("--- Задание 3 завершено ---\n");
         }
 
     }
@@ -213,7 +254,7 @@ namespace ConsoleAppLB8
         public void Service() 
         {
             isUnderService =true;
-            Console.WriteLine($"[Service()] {Name} Начинаю обслуживание");
+            Console.WriteLine($"[CarGlued] {Name} Начинаю обслуживание");
         }
 
         public int GetServiceInterval() 
