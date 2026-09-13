@@ -15,7 +15,9 @@ namespace ConsoleAppLB8
         {
             //Task1();
             //Task2();
-            Task3();
+            //Task3();
+            //Task4();
+            Task5();
 
 
         }
@@ -136,7 +138,83 @@ namespace ConsoleAppLB8
             Console.WriteLine("--- Задание 3 завершено ---\n");
         }
 
+
+        //------------------------------------
+        // Задание 4. Использование стандартных интерфейсов
+        //------------------------------------
+        static void Task4()
+        {
+            Console.WriteLine("--- Задание 4. Использование стандартных интерфейсов ---\n");
+
+            // Создаем массив Vehicle с дополнительными полями для сортировки
+            VehicleComparable[] vehicles = new VehicleComparable[]
+            {
+                new VehicleComparable("Honda", 2015, 350),
+                new VehicleComparable("BMW", 2020, 250),
+                new VehicleComparable("Audi", 2018, 280),
+                new VehicleComparable("Mercedes", 2019, 300),
+                new VehicleComparable("Toyota", 2021, 200)
+            };
+
+            Console.WriteLine("Исходный массив:");
+            PrintVehicles(vehicles);
+
+            // СОРТИРОВКА 1: IComparable (по имени)
+            Console.WriteLine("\n=== Сортировка через IComparable (по Name) ===");
+            Array.Sort(vehicles);
+            PrintVehicles(vehicles);
+
+            // СОРТИРОВКА 2: IComparer (по году выпуска)
+            Console.WriteLine("\n=== Сортировка через IComparer (по Year) ===");
+            Array.Sort(vehicles, new VehicleYearComparer());
+            PrintVehicles(vehicles);
+
+            // СОРТИРОВКА 3: IComparer (по максимальной скорости)
+            Console.WriteLine("\n=== Сортировка через IComparer (по MaxSpeed) ===");
+            Array.Sort(vehicles, new VehicleSpeedComparer());
+            PrintVehicles(vehicles);
+
+            Console.WriteLine("\n--- Задание 4 завершено ---\n");
+        }
+
+        public static void PrintVehicles(VehicleComparable[] vehicles) 
+        {
+            foreach(var v in vehicles) 
+                Console.WriteLine($" {v}"); 
+        }
+
+        static void Task5()
+        {
+            Console.WriteLine("--- Задание 5. Именованные итераторы ---");
+            Console.WriteLine("Вариант 9: Значения факториала от start не больше end\n");
+
+            FactorialIterator iterator = new FactorialIterator();
+
+            Console.WriteLine("--- Пример 1: Факториалы от 1 до 1000000 ---");
+            foreach (var item in iterator.GetFactorials(1, 1000000))
+            {
+                Console.WriteLine(item);
+            }
+
+            Console.WriteLine("\n--- Пример 2: Факториалы от 5 до 10000 ---");
+            foreach (var item in iterator.GetFactorials(5, 10000))
+            {
+                Console.WriteLine(item);
+            }
+
+            Console.WriteLine("\n--- Пример 3: Факториалы от 0 до 100 ---");
+            foreach (var item in iterator.GetFactorials(0, 100))
+            {
+                Console.WriteLine(item);
+            }
+
+            Console.WriteLine("\n--- Задание 5 завершено ---\n");
+        }
+
     }
+
+
+
 
 
 
@@ -145,7 +223,7 @@ namespace ConsoleAppLB8
     //Задание 1 Коллизия имен
     //------------------------------------
 
-    //Создаем интрефейсы , где буедт коллизия у метода Stop()
+            //Создаем интрефейсы , где буедт коллизия у метода Stop()
     interface IMovable 
     {
         void Move();
@@ -352,7 +430,10 @@ namespace ConsoleAppLB8
         }
     }
 
-    
+
+    //------------------------------------
+    // Задание 2. Обобщенные интерфейсы
+    //------------------------------------
     //Обобщенный интерфейс 
     interface IVehicleFactory<out T> 
     {
@@ -390,6 +471,111 @@ namespace ConsoleAppLB8
             return car;
         }
     }
+
+    // ---------------------------------------------------------
+    // ЗАДАНИЕ 4: Стандартные интерфейсы IComparable и IComparer
+    // ---------------------------------------------------------
+
+    class VehicleComparable : IComparable<VehicleComparable>
+    {
+        public string Name { get; set; }
+        public int Year { get; set; }
+        public int MaxSpeed { get; set; }
+
+        public VehicleComparable(string name,int year,int maxSpeed) 
+        {
+            Name = name;
+            Year = year;
+            MaxSpeed = maxSpeed;
+        }
+
+        // соритирова по умолчанию по Имени
+        public int CompareTo(VehicleComparable other) 
+        {
+            if (other  == null) return 1;
+            return Name.CompareTo(other.Name);
+        }
+
+        public override string ToString()
+        {
+            return $"{Name} (год: {Year}, максимальная скорость: {MaxSpeed})";
+        }
+    }
+
+    // Создание класса компоратора для сравниения по году
+    class VehicleYearComparer : IComparer<VehicleComparable> 
+    {
+        public int Compare(VehicleComparable x , VehicleComparable y) 
+        {
+            if (ReferenceEquals(x, y)) return 0;  // оба null или один и тот же объект
+            if (x == null) return -1;             // null меньше не-null
+            if (y == null) return 1;              // не-null больше null
+            return x.Year.CompareTo(y.Year); // от меньшего к большему 
+            return y.Year.CompareTo(x.Year); // от большего к меньшему
+        }
+    }
+
+    // Создание класса компоратора для сравнения по максимально скорости 
+    class VehicleSpeedComparer : IComparer<VehicleComparable> 
+    {
+        public int Compare(VehicleComparable x , VehicleComparable y) 
+        {
+            if (ReferenceEquals(x, y))return 0;
+            if (x == null) return -1;
+            if (y == null) return 1;
+            //return x.MaxSpeed.CompareTo(y.MaxSpeed); // от меньшего к большему 
+            return y.MaxSpeed.CompareTo(x.MaxSpeed); // от большего к меньшему 
+        }
+    }
+
+
+    class FactorialIterator
+    {
+        // Именованный итератор - возвращает факториалы от start! до значения, не превышающего end
+        public IEnumerable<string> GetFactorials(int start, long end)
+        {
+            // Валидация входных данных
+            if (start < 0)
+            {
+                yield return "Ошибка: start не может быть отрицательным";
+                yield break;
+            }
+
+            if (end < 0)
+            {
+                yield return "Ошибка: end не может быть отрицательным";
+                yield break;
+            }
+
+            long factorial = 1;
+
+            // Вычисляем факториал для start
+            for (int i = 1; i <= start; i++)
+            {
+                factorial *= i;
+            }
+
+            // Если уже стартовое значение больше end
+            if (factorial > end)
+            {
+                yield return $"Факториал {start}! = {factorial} уже превышает {end}";
+                yield break;
+            }
+
+            // Возвращаем значения факториалов
+            int n = start;
+            while (factorial <= end)
+            {
+                yield return $"{n}! = {factorial}";
+
+                n++;
+                factorial *= n;
+
+            }
+        }
+    }
+
+
 
 
 }
